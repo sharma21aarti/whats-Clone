@@ -1,8 +1,11 @@
 import { Avatar } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import "./SidebarChats.css";
+import db from "./firebase";
+import { collection, getDocs, addDoc } from "firebase/firestore/lite";
+import { CompareArrowsOutlined } from "@material-ui/icons";
 
-function SidebarChats({ addNewChat }) {
+function SidebarChats({ id, name, addNewChat, newRoomHandler }) {
   const [profile, setProfile] = useState("");
 
   useEffect(() => {
@@ -14,6 +17,11 @@ function SidebarChats({ addNewChat }) {
 
     if (PersonName) {
       //do after some time
+      addDoc(collection(db, "rooms"), {
+        Name: PersonName,
+      });
+      console.log("hello", newRoomHandler, typeof newRoomHandler);
+      newRoomHandler(profile);
     }
   };
 
@@ -23,7 +31,7 @@ function SidebarChats({ addNewChat }) {
         src={`https://avatars.dicebear.com/api/adventurer/:${profile}.svg`}
       />
       <div className="sidebarChats_Info">
-        <h2>Person Name</h2>
+        <h2>{name}</h2>
         <p>Last Chat ....</p>
       </div>
     </div>

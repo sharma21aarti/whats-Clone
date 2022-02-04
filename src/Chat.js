@@ -10,11 +10,19 @@ import {
 } from "@material-ui/icons";
 
 function Chat() {
+  const [input, setInput] = useState("");
   const [profile, setProfile] = useState("");
 
   useEffect(() => {
     setProfile(Math.floor(Math.random() * 5000));
   }, []);
+
+  const sendMessage = (e) => {
+    e.preventDefault();
+    console.log("first", input);
+    setInput("");
+  };
+
   return (
     <div className="chat">
       <div className="chatHeader">
@@ -48,8 +56,15 @@ function Chat() {
       <div className="chatFooter">
         <InsertEmoticon />
         <form>
-          <input placeholder="Type a message" type="text" />
-          <button>Send a message</button>
+          <input
+            placeholder="Type a message"
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+          <button onClick={sendMessage} type="submit">
+            Send a message
+          </button>
         </form>
         <Mic />
       </div>

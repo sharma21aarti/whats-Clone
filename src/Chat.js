@@ -1,6 +1,5 @@
+import { getDoc, doc, snapshotEqual } from "@firebase/firestore/lite";
 import { Avatar, IconButton } from "@material-ui/core";
-import React, { useState, useEffect } from "react";
-import "./Chat.css";
 import {
   AttachFile,
   InsertEmoticon,
@@ -8,14 +7,32 @@ import {
   MoreVert,
   Search,
 } from "@material-ui/icons";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import "./Chat.css";
+import db from "./firebase";
 
 function Chat() {
   const [input, setInput] = useState("");
   const [profile, setProfile] = useState("");
+  const { roomId } = useParams();
+  const [roomName, setRoomName] = useState();
+  console.log("params", roomId);
+
+  async function getRoom(db) {
+    console.log("Id", roomId);
+
+    const roomColl = doc(db, "rooms", roomId);
+    const roomdoc = await getDoc(roomColl);
+
+    console.log("room data", roomdoc.data());
+    setRoomName(roomdoc.data().Name);
+  }
 
   useEffect(() => {
+    getRoom(db);
     setProfile(Math.floor(Math.random() * 5000));
-  }, []);
+  }, [roomId]);
 
   const sendMessage = (e) => {
     e.preventDefault();
@@ -31,7 +48,7 @@ function Chat() {
         />
 
         <div className="chatHEader_Info">
-          <h3>Person Name</h3>
+          <h3>{roomName} </h3>
           <p>Last Seen at...</p>
         </div>
         <div className="chat_headerRight">

@@ -16,8 +16,12 @@ function Sidebar() {
     console.log("callewd");
     async function getRooms(db) {
       const roomCol = collection(db, "rooms");
+
       const roomSnapshot = await getDocs(roomCol);
-      const roomList = roomSnapshot.docs.map((doc) => doc.data());
+      const roomList = roomSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        data: doc.data(),
+      }));
       console.log(roomList);
       setRooms(roomList);
     }
@@ -36,7 +40,7 @@ function Sidebar() {
     // setRooms(a.docs);
   }, [newRoomId]);
 
-  console.log("sss", rooms);
+  // console.log("sss", rooms);
   return (
     <div className="sidebar">
       <div className="sidebar_header">
@@ -60,17 +64,12 @@ function Sidebar() {
         </div>
       </div>
       <div className="sidebar_chats">
-        <SidebarChats addNewChat />
-        {rooms.map((room, i) => {
+        <SidebarChats addNewChat newRoomHandler={newRoomHandler} />
+        {rooms.map((room) => {
           // const name = room.data();
           // console.log("okkaaa", name);
           return (
-            <SidebarChats
-              key={room.id}
-              id={room.id}
-              name={room.name}
-              newRoomHandler={newRoomHandler}
-            />
+            <SidebarChats key={room.id} id={room.id} name={room.data.Name} />
             // <SidebarChats key={i + 1} name={room.Name} />
           );
         })}

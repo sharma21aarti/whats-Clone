@@ -1,5 +1,6 @@
 import { Avatar } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import "./SidebarChats.css";
 import db from "./firebase";
 import { collection, getDocs, addDoc } from "firebase/firestore/lite";
@@ -26,15 +27,17 @@ function SidebarChats({ id, name, addNewChat, newRoomHandler }) {
   };
 
   return !addNewChat ? (
-    <div className="sidebarChats">
-      <Avatar
-        src={`https://avatars.dicebear.com/api/adventurer/:${profile}.svg`}
-      />
-      <div className="sidebarChats_Info">
-        <h2>{name}</h2>
-        <p>Last Chat ....</p>
+    <Link to={`rooms/${id}`}>
+      <div className="sidebarChats">
+        <Avatar
+          src={`https://avatars.dicebear.com/api/adventurer/:${profile}.svg`}
+        />
+        <div className="sidebarChats_Info">
+          <h2>{name}</h2>
+          <p>Last Chat ....</p>
+        </div>
       </div>
-    </div>
+    </Link>
   ) : (
     <div onClick={createChat} className="sidebarChats">
       <h2>Add New Chat</h2>

@@ -1,17 +1,16 @@
-import React from "react";
 import { Button } from "@material-ui/core";
 import { auth, provider } from "./firebase";
-import { signInWithPopup } from "@firebase/auth";
+import React from "react";
 import "./LogIn.css";
-// import { error } from "firebase-functions/logger";
+import { signInWithPopup } from "@firebase/auth";
 
 function LogIn() {
   const signIn = () => {
     signInWithPopup(auth, provider)
-      .then((result) => {
-        console.log(result);
-      })
-      .catch((error) => alert(error.message));
+      .then((result) => console.log("result", result))
+      .catch((error) => {
+        alert(error.message);
+      });
   };
   return (
     <div className="login">

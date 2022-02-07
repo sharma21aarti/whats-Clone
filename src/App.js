@@ -4,12 +4,11 @@ import "./App.css";
 import Sidebar from "./Sidebar";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import LogIn from "./LogIn";
-import { useStateValue } from "./StateProvider";
 // import { useParams } from "react-router";
 // import { Room } from "@material-ui/icons";
 
 function App() {
-  const [{ user }, dispatch] = useStateValue();
+  const [user, setUser] = useState();
 
   return (
     <div className="App">

@@ -5,10 +5,13 @@ import "./Sidebar.css";
 import SidebarChats from "./SidebarChats";
 import db from "./firebase";
 import { collection, getDocs } from "firebase/firestore/lite";
+import { useStateValue } from "./Reducer";
 function Sidebar() {
   console.log("first");
   const [rooms, setRooms] = useState([]);
   const [newRoomId, setNewRoomId] = useState("");
+  const [{ user }, dispatch] = useStateValue();
+
   const newRoomHandler = (roomId) => {
     setNewRoomId(roomId);
   };
@@ -44,7 +47,7 @@ function Sidebar() {
   return (
     <div className="sidebar">
       <div className="sidebar_header">
-        <Avatar />
+        <Avatar src={user.photoURL} />
         <div className="sidebar_headerRight">
           <IconButton>
             <DonutLarge />

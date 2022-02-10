@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./SidebarChats.css";
 import db from "./firebase";
-import { collection, getDocs, addDoc } from "firebase/firestore/lite";
-import { CompareArrowsOutlined } from "@material-ui/icons";
+import { collection, addDoc } from "firebase/firestore/lite";
+// import { CompareArrowsOutlined } from "@material-ui/icons";
 
 function SidebarChats({ id, name, addNewChat, newRoomHandler }) {
   const [profile, setProfile] = useState("");

@@ -52,6 +52,7 @@
   font-size: xx-small;
 }
 .chat_timespan {
+  margin-left: 5px;
   font-size: 10px;
   margin-left: xx-small;
 }

@@ -21,6 +21,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore/lite";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
+// import { firestore } from "firebase-functions/v1";
 const firebaseConfig = {
   apiKey: "AIzaSyCy1icN1TsOfWXxwxGY6mVhR-lMJAXZJLQ",
   authDomain: "whats-app-clone-eb7b5.firebaseapp.com",
@@ -38,3 +39,15 @@ const provider = new GoogleAuthProvider();
 
 export { auth, provider };
 export default db;
+
+// const subcallref = collection(roomColl, "message");
+// console.log("subcallref", subcallref);
+
+// const a = await getDocs(subcallref);
+
+// console.log(a);
+// // // console.log(a._docs);
+// a._docs.map((item) => {
+//   console.log("itemmmmm", item.data());
+//   setMessage([...message, item.data()]);
+// });

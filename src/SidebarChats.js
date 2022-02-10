@@ -3,13 +3,30 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "./SidebarChats.css";
 import db from "./firebase";
-import { collection, addDoc } from "firebase/firestore/lite";
+import { orderBy } from "firebase/firestore";
+import {
+  getDoc,
+  doc,
+  collection,
+  getDocs,
+  addDoc,
+} from "@firebase/firestore/lite";
+// import { collection, addDoc } from "firebase/firestore/lite";
 // import { CompareArrowsOutlined } from "@material-ui/icons";
 
 function SidebarChats({ id, name, addNewChat, newRoomHandler }) {
   const [profile, setProfile] = useState("");
+  // const [messages, setMessages] = useState();
+
+  // async function getSidebarData() {
+  //   if (id) {
+  //     const roomColl = collection(db, "rooms", id, "messages");
+  //     roomColl.orderBy("timestamp", "desc");
+  //   }
+  // }
 
   useEffect(() => {
+    // getSidebarData();
     setProfile(Math.floor(Math.random() * 5000));
   }, []);
 

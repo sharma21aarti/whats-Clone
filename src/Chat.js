@@ -6,6 +6,7 @@ import {
   getDocs,
   addDoc,
 } from "@firebase/firestore/lite";
+import { onSnapshot } from "firebase/firestore";
 import _ from "lodash";
 import { Avatar, IconButton } from "@material-ui/core";
 import {
@@ -47,19 +48,20 @@ function Chat() {
     //   "timestamp",
     //   "asc"
     // );
-    const subcallref = collection(db, "rooms", roomId, "message");
+    const subcallref = collection(roomColl, "message");
     console.log("subcallref", subcallref);
 
     const a = await getDocs(subcallref);
 
-    console.log("line 55", a);
+    console.log(a);
     const chatData = [];
-    const docData = a["_doc"];
-    console.log("docData", docData);
+    const docData = a["_docs"];
+    // // console.log(a._docs);
     docData.map((item) => {
       console.log("itemmmmm", item.data());
-      // setMessage([...message, item.data()]);
+      chatData.push(item.data());
     });
+    setMessage(chatData);
     // }
     // const messageColl = collection(roomColl, "message").orderBy(
     //   "timespan",
@@ -67,33 +69,42 @@ function Chat() {
     // );
     // setMessage(messageColl.data());
   }
-  const getChatData = (roomId) => {
-    //require unique roomID as an argument
-    //pass args to firebase and get data to chats
-    //verify data from database
-    // set to a local state
-    // return
-  };
-
+  useEffect(() => {
+    const colRef = collection(db, "rooms");
+    //real time update
+    onSnapshot(colRef, (snapshot) => {
+      snapshot.docs.forEach((doc) => {
+        // setTestData((prev) => [...prev, doc.data()]);
+        console.log("onsnapshot", doc.data());
+      });
+    });
+  }, []);
   useEffect(() => {
     getRoom(db);
     setProfile(Math.floor(Math.random() * 5000));
-    // getChatData(roomId);
   }, [roomId]);
 
   const sendMessage = (e) => {
     e.preventDefault();
     console.log("input", input);
 
-    const roomColl = collection(db, "rooms", roomId);
-    // const subcallref = collection(roomColl, "message");
+    const roomColl = doc(db, "rooms", roomId);
+    const subcallref = collection(roomColl, "message");
     addDoc(collection(roomColl, "message"), {
       message: input,
       name: user.displayName,
     });
     console.log("message", message);
-    setMessage([...message]);
+    // setMessage([...message]);
     setInput("");
+  };
+
+  const getChatData = (roomId) => {
+    //require unique roomID as an argument
+    //pass args to firebase and get data to chats
+    //verify data from database
+    // set to a local state
+    // return
   };
 
   return (

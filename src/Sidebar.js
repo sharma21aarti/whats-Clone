@@ -4,8 +4,9 @@ import React, { useState, useEffect } from "react";
 import "./Sidebar.css";
 import SidebarChats from "./SidebarChats";
 import db from "./firebase";
-import { collection, getDocs } from "firebase/firestore/lite";
+import { collection, getDocs, doc } from "firebase/firestore/lite";
 import { useStateValue } from "./Reducer";
+import { onSnapshot } from "@firebase/firestore";
 function Sidebar() {
   console.log("first");
   const [rooms, setRooms] = useState([]);
@@ -18,7 +19,8 @@ function Sidebar() {
   useEffect(() => {
     console.log("callewd");
     async function getRooms(db) {
-      const roomCol = collection(db, "rooms");
+      console.log("here");
+      const roomCol = await collection(db, "rooms");
 
       const roomSnapshot = await getDocs(roomCol);
       const roomList = roomSnapshot.docs.map((doc) => ({
@@ -27,15 +29,9 @@ function Sidebar() {
       }));
       console.log(roomList);
       setRooms(roomList);
+
+      // await onSnapshot(collection(db, "rooms"), (snap) => {});
     }
-    // getDocs(collection(db, "rooms")).onSnaopshot((snapshot) =>
-    //   setRooms(
-    //     snapshot.docs.map((doc) => ({
-    //       id: doc.id,
-    //       data: doc.data(),
-    //     }))
-    //   )
-    // );
 
     getRooms(db);
 
@@ -45,39 +41,41 @@ function Sidebar() {
 
   // console.log("sss", rooms);
   return (
-    <div className="sidebar">
-      <div className="sidebar_header">
-        <Avatar src={user.photoURL} />
-        <div className="sidebar_headerRight">
-          <IconButton>
-            <DonutLarge />
-          </IconButton>
-          <IconButton>
-            <Chat />
-          </IconButton>
-          <IconButton>
-            <MoreVert />
-          </IconButton>
+    <>
+      <div className="sidebar">
+        <div className="sidebar_header">
+          <Avatar src={user.photoURL} />
+          <div className="sidebar_headerRight">
+            <IconButton>
+              <DonutLarge />
+            </IconButton>
+            <IconButton>
+              <Chat />
+            </IconButton>
+            <IconButton>
+              <MoreVert />
+            </IconButton>
+          </div>
+        </div>
+        <div className="sidebar_search">
+          <div className="sidebar_searchContainer">
+            <Search />
+            <input placeholder="Search or Start the new chats" type="text" />
+          </div>
+        </div>
+        <div className="sidebar_chats">
+          <SidebarChats addNewChat newRoomHandler={newRoomHandler} />
+          {rooms.map((room) => {
+            // const name = room.data();
+            // console.log("okkaaa", name);
+            return (
+              <SidebarChats key={room.id} id={room.id} name={room.data.Name} />
+              // <SidebarChats key={i + 1} name={room.Name} />
+            );
+          })}
         </div>
       </div>
-      <div className="sidebar_search">
-        <div className="sidebar_searchContainer">
-          <Search />
-          <input placeholder="Search or Start the new chats" type="text" />
-        </div>
-      </div>
-      <div className="sidebar_chats">
-        <SidebarChats addNewChat newRoomHandler={newRoomHandler} />
-        {rooms.map((room) => {
-          // const name = room.data();
-          // console.log("okkaaa", name);
-          return (
-            <SidebarChats key={room.id} id={room.id} name={room.data.Name} />
-            // <SidebarChats key={i + 1} name={room.Name} />
-          );
-        })}
-      </div>
-    </div>
+    </>
   );
 }
 

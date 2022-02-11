@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { serverTimestamp } from "@firebase/firestore/lite";
 import {
   getDoc,
@@ -31,10 +31,11 @@ function Chat() {
   const [roomName, setRoomName] = useState();
   const [message, setMessage] = useState([]);
   const [{ user }, dispatch] = useStateValue();
+  const messageRef = useRef(null);
 
   console.log("params", roomId);
 
-  async function getRoom(db) {
+  async function getRooms(db) {
     console.log("Id", roomId);
     // if (roomId) {
     const roomColl = doc(db, "rooms", roomId);
@@ -51,16 +52,13 @@ function Chat() {
     //   "asc"
     // );
     const subcallref = collection(roomColl, "messages");
-    console.log("subcallref", subcallref);
 
     const a = await getDocs(subcallref);
 
-    console.log(a);
     let chatData = [];
     const docData = a["_docs"];
     // // console.log(a._docs);
     docData.map((item) => {
-      console.log("itemmmmm", item.data());
       chatData.push(item.data());
     });
 
@@ -85,14 +83,19 @@ function Chat() {
   //     });
   //   });
   // }, []);
+  const scrollToBottom = () => {
+    messageRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
   useEffect(() => {
-    getRoom(db);
+    getRooms(db);
     setProfile(Math.floor(Math.random() * 5000));
+    if (messageRef) {
+      scrollToBottom();
+    }
   }, [roomId]);
 
   const sendMessage = (e) => {
     e.preventDefault();
-    console.log("input", input);
 
     const roomColl = doc(db, "rooms", roomId);
     // const subcallref = collection(roomColl, "messages");
@@ -102,7 +105,6 @@ function Chat() {
       timestamp: new Date().getTime(),
     });
 
-    console.log("message", message);
     setMessage([
       ...message,
       {
@@ -111,10 +113,7 @@ function Chat() {
         timestamp: new Date().getTime(),
       },
     ]);
-    // console.log("somthingg new", [
-    //   ...message,
-    //   { message: input, name: user.displayName },
-    // ]);
+
     setInput("");
   };
 
@@ -127,66 +126,128 @@ function Chat() {
   // };
 
   return (
-    <div className="chat">
-      {console.log(message)}
-      <div className="chatHeader">
-        <Avatar
-          src={`https://avatars.dicebear.com/api/adventurer/:${profile}.svg`}
-        />
+    <>
+      {message.length > 0 ? (
+        <div className="chat">
+          <div className="chatHeader">
+            <Avatar
+              src={`https://avatars.dicebear.com/api/adventurer/:${profile}.svg`}
+            />
 
-        <div className="chatHEader_Info">
-          <h3>{roomName} </h3>
-          <p>
-            Last Seen{" "}
-            {/* {new Date(message.timestamp[message.length]).toLocaleString()} */}
-          </p>
+            <div className="chatHEader_Info">
+              <h3>{roomName} </h3>
+              <p>
+                Last Seen{" "}
+                {new Date(
+                  message[message.length - 1].timestamp
+                ).toLocaleString()}{" "}
+              </p>
+            </div>
+            <div className="chat_headerRight">
+              <IconButton>
+                <Search />
+              </IconButton>
+              <IconButton>
+                <AttachFile />
+              </IconButton>
+              <IconButton>
+                <MoreVert />
+              </IconButton>
+            </div>
+          </div>
+          <div className="chatBody">
+            {message.map((msg, i) => {
+              return (
+                <p
+                  key={i}
+                  className={`chat_message ${
+                    msg.name === user.displayName && "chat_reciever"
+                  }`}
+                >
+                  <span className="chat_name"> {msg.name} </span>
+                  {msg.message}
+                  <span className="chat_timespan">
+                    {new Date(msg.timestamp).toLocaleString()}
+                  </span>
+                </p>
+              );
+            })}
+          </div>
+          <div className="chatFooter">
+            <InsertEmoticon />
+            <form>
+              <input
+                placeholder="Type a message"
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+              />
+              <button onClick={sendMessage} type="submit">
+                Send a message
+              </button>
+            </form>
+            <Mic />
+          </div>
         </div>
-        <div className="chat_headerRight">
-          <IconButton>
-            <Search />
-          </IconButton>
-          <IconButton>
-            <AttachFile />
-          </IconButton>
-          <IconButton>
-            <MoreVert />
-          </IconButton>
+      ) : (
+        <div className="chat">
+          <div className="chatHeader">
+            <Avatar
+              src={`https://avatars.dicebear.com/api/adventurer/:${profile}.svg`}
+            />
+
+            <div className="chatHEader_Info">
+              <h3>{roomName} </h3>
+              <p>Last Seen </p>
+            </div>
+            <div className="chat_headerRight">
+              <IconButton>
+                <Search />
+              </IconButton>
+              <IconButton>
+                <AttachFile />
+              </IconButton>
+              <IconButton>
+                <MoreVert />
+              </IconButton>
+            </div>
+          </div>
+          <div className="chatBody" ref={messageRef}>
+            {message.map((msg, i) => {
+              return (
+                <p
+                  key={i}
+                  className={`chat_message ${
+                    msg.name === user.displayName && "chat_reciever"
+                  }`}
+                >
+                  <span className="chat_name"> {msg.name} </span>
+                  {msg.message}
+                  <span className="chat_timespan">
+                    {new Date(msg.timestamp).toLocaleString()}
+                  </span>
+                </p>
+              );
+            })}
+          </div>
+          <div className="chatFooter">
+            <InsertEmoticon />
+            <form>
+              <input
+                placeholder="Type a message"
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+              />
+              <button onClick={sendMessage} type="submit">
+                Send a message
+              </button>
+            </form>
+            <Mic />
+          </div>
         </div>
-      </div>
-      <div className="chatBody">
-        {message.map((msg, i) => {
-          return (
-            <p
-              key={i}
-              className={`chat_message ${
-                msg.name === user.displayName && "chat_reciever"
-              }`}
-            >
-              <span className="chat_name"> {msg.name} </span>
-              {msg.message}
-              <span className="chat_timespan">
-                {new Date(msg.timestamp).toLocaleString()}
-              </span>
-            </p>
-          );
-        })}
-      </div>
-      <div className="chatFooter">
-        <InsertEmoticon />
-        <form>
-          <input
-            placeholder="Type a message"
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-          <button onClick={sendMessage} type="submit">
-            Send a message
-          </button>
-        </form>
-        <Mic />
-      </div>
-    </div>
+      )}
+    </>
   );
 }
 

@@ -1,34 +1,33 @@
+import { addDoc, collection, doc, getDocs } from "@firebase/firestore/lite";
 import { Avatar } from "@material-ui/core";
+import { query, orderBy } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import "./SidebarChats.css";
 import db from "./firebase";
-import { orderBy } from "firebase/firestore";
-import {
-  getDoc,
-  doc,
-  collection,
-  getDocs,
-  addDoc,
-} from "@firebase/firestore/lite";
+import "./SidebarChats.css";
 // import { collection, addDoc } from "firebase/firestore/lite";
 // import { CompareArrowsOutlined } from "@material-ui/icons";
 
 function SidebarChats({ id, name, addNewChat, newRoomHandler }) {
   const [profile, setProfile] = useState("");
-  // const [messages, setMessages] = useState();
+  const [messages, setMessages] = useState();
 
-  // async function getSidebarData() {
-  //   if (id) {
-  //     const roomColl = collection(db, "rooms", id, "messages");
-  //     roomColl.orderBy("timestamp", "desc");
-  //   }
-  // }
+  async function getSidebarData(id) {
+    console.log("called");
+    if (id) {
+      let roomColl = collection(db, "rooms", id, "messages");
+      console.log("dattttaaa", roomColl);
+
+      roomColl = query(roomColl, orderBy("timestamp", "desc"));
+
+      console.log("orderedData", roomColl);
+    }
+  }
 
   useEffect(() => {
-    // getSidebarData();
+    getSidebarData(id);
     setProfile(Math.floor(Math.random() * 5000));
-  }, []);
+  }, [id]);
 
   const createChat = () => {
     const PersonName = prompt("Hey! Enter your Name For Chat");

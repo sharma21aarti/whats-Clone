@@ -4,40 +4,46 @@ import React, { useState, useEffect } from "react";
 import "./Sidebar.css";
 import SidebarChats from "./SidebarChats";
 import db from "./firebase";
-import { collection, getDocs, doc } from "firebase/firestore/lite";
+import { collection, getDocs, doc, onSnapshot } from "firebase/firestore";
 import { useStateValue } from "./Reducer";
-import { onSnapshot } from "@firebase/firestore";
+import {} from "@firebase/firestore";
 function Sidebar() {
   console.log("first");
   const [rooms, setRooms] = useState([]);
-  const [newRoomId, setNewRoomId] = useState("");
+  // const [newRoomId, setNewRoomId] = useState("");
   const [{ user }, dispatch] = useStateValue();
 
-  const newRoomHandler = (roomId) => {
-    setNewRoomId(roomId);
-  };
+  // const newRoomHandler = (roomId) => {
+  //   setNewRoomId(roomId);
+  // };
   useEffect(() => {
     console.log("callewd");
-    async function getRooms(db) {
-      console.log("here");
-      const roomCol = await collection(db, "rooms");
 
-      const roomSnapshot = await getDocs(roomCol);
-      const roomList = roomSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        data: doc.data(),
-      }));
-      console.log(roomList);
-      setRooms(roomList);
+    // const roomCol = await collection(db, "rooms");
 
-      // await onSnapshot(collection(db, "rooms"), (snap) => {});
-    }
+    // const roomSnapshot = await getDocs(roomCol);
+    // const roomList = roomSnapshot.docs.map((doc) => ({
+    //   id: doc.id,
+    //   data: doc.data(),
+    // }));
+    // console.log(roomList);
+    // setRooms(roomList);
+    console.log("hers", collection(db, "rooms"));
 
-    getRooms(db);
+    // const q = collection(db, "rooms");
+    onSnapshot(collection(db, "rooms"), (snap) =>
+      setRooms(
+        snap.docs.map((item) => {
+          return { id: item.id, data: item.data() };
+        })
+      )
+    );
+
+    // getRooms(db);
 
     // const a = getDocs(collection(db, "rooms"));
     // setRooms(a.docs);
-  }, [newRoomId]);
+  }, []);
 
   // console.log("sss", rooms);
   return (
@@ -64,7 +70,7 @@ function Sidebar() {
           </div>
         </div>
         <div className="sidebar_chats">
-          <SidebarChats addNewChat newRoomHandler={newRoomHandler} />
+          <SidebarChats addNewChat />
           {rooms.map((room) => {
             // const name = room.data();
             // console.log("okkaaa", name);

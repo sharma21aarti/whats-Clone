@@ -1,15 +1,11 @@
-import React, { useEffect, useState, useRef } from "react";
-import { serverTimestamp } from "@firebase/firestore/lite";
 import {
-  getDoc,
-  doc,
-  collection,
-  getDocs,
   addDoc,
-} from "@firebase/firestore/lite";
-
-import { orderBy } from "firebase/firestore";
-import _ from "lodash";
+  collection,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+} from "@firebase/firestore";
 import { Avatar, IconButton } from "@material-ui/core";
 import {
   AttachFile,
@@ -18,6 +14,7 @@ import {
   MoreVert,
   Search,
 } from "@material-ui/icons";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./Chat.css";
 import db from "./firebase";
@@ -29,65 +26,29 @@ function Chat() {
   const [profile, setProfile] = useState("");
   const { roomId } = useParams();
   const [roomName, setRoomName] = useState();
-  const [message, setMessage] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [{ user }, dispatch] = useStateValue();
   const messageRef = useRef(null);
 
   console.log("params", roomId);
-
-  async function getRooms(db) {
-    console.log("Id", roomId);
-    // if (roomId) {
-    const roomColl = doc(db, "rooms", roomId);
-    const roomdoc = await getDoc(roomColl);
-
-    console.log("room data", roomdoc.data());
-    setRoomName(roomdoc.data().Name);
-
-    // const data = collection(db, "rooms");
-    // const docData = doc(data, roomId);
-    // const messageData = _.orderBy(
-    //   collection(docData, "message"),
-    //   "timestamp",
-    //   "asc"
-    // );
-    const subcallref = collection(roomColl, "messages");
-
-    const a = await getDocs(subcallref);
-
-    let chatData = [];
-    const docData = a["_docs"];
-    // // console.log(a._docs);
-    docData.map((item) => {
-      chatData.push(item.data());
-    });
-
-    chatData.sort((a, b) => {
-      return a.timestamp - b.timestamp;
-    });
-    setMessage(chatData);
-    // }
-    // const messageColl = collection(roomColl, "message").orderBy(
-    //   "timespan",
-    //   "asc"
-    // );
-    // setMessage(messageColl.data());
-  }
-  // useEffect(() => {
-  //   const colRef = collection(db, "rooms");
-  //   //real time update
-  //   onSnapshot(colRef, (snapshot) => {
-  //     snapshot.docs.forEach((doc) => {
-  //       // setTestData((prev) => [...prev, doc.data()]);
-  //       console.log("onsnapshot", doc.data());
-  //     });
-  //   });
-  // }, []);
   const scrollToBottom = () => {
     messageRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
   useEffect(() => {
-    getRooms(db);
+    scrollToBottom();
+
+    const roomColl = doc(db, "rooms", roomId);
+
+    onSnapshot(roomColl, (snap) => setRoomName(snap.data().Name));
+
+    onSnapshot(
+      query(collection(roomColl, "messages"), orderBy("timestamp", "asc")),
+      (snapshot) => {
+        setMessages(snapshot.docs.map((doc) => doc.data()));
+      }
+    );
+
     setProfile(Math.floor(Math.random() * 5000));
     if (messageRef) {
       scrollToBottom();
@@ -96,23 +57,15 @@ function Chat() {
 
   const sendMessage = (e) => {
     e.preventDefault();
-
-    const roomColl = doc(db, "rooms", roomId);
+    console.log("tou typed >>>", input);
+    const roomColl = collection(db, "rooms");
+    const roomdoc = doc(roomColl, roomId);
     // const subcallref = collection(roomColl, "messages");
-    addDoc(collection(roomColl, "messages"), {
+    addDoc(collection(roomdoc, "messages"), {
       message: input,
       name: user.displayName,
       timestamp: new Date().getTime(),
     });
-
-    setMessage([
-      ...message,
-      {
-        message: input,
-        name: user.displayName,
-        timestamp: new Date().getTime(),
-      },
-    ]);
 
     setInput("");
   };
@@ -127,7 +80,7 @@ function Chat() {
 
   return (
     <>
-      {message.length > 0 ? (
+      {messages.length > 0 ? (
         <div className="chat">
           <div className="chatHeader">
             <Avatar
@@ -139,7 +92,7 @@ function Chat() {
               <p>
                 Last Seen{" "}
                 {new Date(
-                  message[message.length - 1].timestamp
+                  messages[messages.length - 1].timestamp
                 ).toLocaleString()}{" "}
               </p>
             </div>
@@ -155,8 +108,8 @@ function Chat() {
               </IconButton>
             </div>
           </div>
-          <div className="chatBody">
-            {message.map((msg, i) => {
+          <div className="chatBody" ref={messageRef}>
+            {messages.map((msg, i) => {
               return (
                 <p
                   key={i}
@@ -213,7 +166,7 @@ function Chat() {
             </div>
           </div>
           <div className="chatBody" ref={messageRef}>
-            {message.map((msg, i) => {
+            {messages.map((msg, i) => {
               return (
                 <p
                   key={i}

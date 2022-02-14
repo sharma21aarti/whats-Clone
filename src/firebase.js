@@ -19,7 +19,7 @@
 // export default db;
 
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore/lite";
+import { getFirestore } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 // import { firestore } from "firebase-functions/v1";
 const firebaseConfig = {

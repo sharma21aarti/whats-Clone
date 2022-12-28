@@ -34,20 +34,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth();
+const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
 export { auth, provider };
 export default db;
-
-// const subcallref = collection(roomColl, "message");
-// console.log("subcallref", subcallref);
-
-// const a = await getDocs(subcallref);
-
-// console.log(a);
-// // // console.log(a._docs);
-// a._docs.map((item) => {
-//   console.log("itemmmmm", item.data());
-//   setMessage([...message, item.data()]);
-// });

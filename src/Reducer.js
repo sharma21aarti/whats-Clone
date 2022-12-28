@@ -7,12 +7,8 @@ export const initialState = {
 export const actionTypes = {
   SET_USER: "SET_USER",
 };
-console.log("set_user");
 
 const reducer = (state, action) => {
-  console.log("action", action);
-  console.log("state", state);
-
   switch (action.type) {
     case actionTypes.SET_USER:
       return {
@@ -23,7 +19,6 @@ const reducer = (state, action) => {
     default:
       return state;
   }
-  console.log("user", state);
 };
 
 export default reducer;

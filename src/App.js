@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Chat from "./Chat";
 import "./App.css";
 import Sidebar from "./Sidebar";
@@ -10,23 +10,23 @@ import { useStateValue } from "./Reducer";
 
 function App() {
   const [{ user }, dispatch] = useStateValue();
+  console.log(user, "user");
+  const [rId, setRId] = useState("");
   return (
     <div className="App">
-      {console.log("in app", user)}
       {!user ? (
         <LogIn />
       ) : (
         <div className="app_body">
-          {/* <Sidebar />
-        <Chat /> */}
           <Router>
-            <Sidebar />
+            <Sidebar setRId={setRId} />
             <Routes>
-              <Route path="/rooms/:roomId" element={<Chat />} />
+              <Route path="rooms" element={<Sidebar />}></Route>
+              <Route path="/users/:roomId" element={<Chat rId={rId} />} />
             </Routes>
-            <Routes>
+            {/* <Routes>
               <Route path="/" element={<Chat />}></Route>
-            </Routes>
+            </Routes> */}
           </Router>
         </div>
       )}

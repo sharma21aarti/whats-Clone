@@ -3,6 +3,11 @@
   flex-direction: column;
   flex: 0.35;
 }
+/* .chat {
+  flex: 0.65;
+  display: flex;
+  flex-direction: column;
+} */
 .sidebar_header {
   display: flex;
   justify-content: space-between;

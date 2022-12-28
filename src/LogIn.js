@@ -4,22 +4,28 @@ import "./LogIn.css";
 import { signInWithPopup } from "@firebase/auth";
 import { provider, auth } from "./firebase";
 import { actionTypes, useStateValue } from "./Reducer";
-// import { useStateValue } from "./StateProvider";
-// import { error } from "firebase-functions/logger";
-
+import db from "./firebase";
+import { doc, setDoc } from "firebase/firestore";
 function LogIn() {
-  console.log("logIn");
   const [{ user }, dispatch] = useStateValue();
-  console.log("in login", user);
+
   const signIn = () => {
+    async function addCollection(result) {
+      dispatch({
+        type: actionTypes.SET_USER,
+        user: result.user,
+      });
+
+      const newUser = await doc(db, "users", result.user.uid);
+      await setDoc(newUser, {
+        id: result.user.uid,
+        name: result.user.displayName,
+      });
+    }
+
     signInWithPopup(auth, provider)
       .then((result) => {
-        console.log("hello", result.user);
-        console.log("SET_USER", actionTypes.SET_USER);
-        dispatch({
-          type: actionTypes.SET_USER,
-          user: result.user,
-        });
+        addCollection(result);
       })
       .catch((error) => {
         alert(error.message);

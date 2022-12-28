@@ -1,80 +1,65 @@
-import {
-  collection,
-  addDoc,
-  doc,
-  getDocs,
-  onSnapshot,
-} from "@firebase/firestore";
+import { addDoc, collection, doc, onSnapshot } from "@firebase/firestore";
 import { Avatar } from "@material-ui/core";
-import { query, orderBy } from "firebase/firestore";
+// import { user } from "firebase-functions/v1/auth";
+import { orderBy, query, where } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
+import { useStateValue } from "./Reducer";
 import { Link } from "react-router-dom";
 import db from "./firebase";
 import "./SidebarChats.css";
 // import { collection, addDoc } from "firebase/firestore/lite";
 // import { CompareArrowsOutlined } from "@material-ui/icons";
 
-function SidebarChats({ id, name, addNewChat }) {
+function SidebarChats({ id, name, users, selectUser }) {
   const [profile, setProfile] = useState("");
   const [lastMsg, setLastMsg] = useState();
+  const [{ user }, dispatch] = useStateValue();
+  const id1 =
+    user.uid > id ? `${id + " " + user.uid}` : `${user.uid + " " + id}`;
 
   async function getSidebarData(id) {
-    console.log("called");
+    console.log(id, id1, "id");
+    const collRef = collection(db, "messages");
 
-    let roomColl = doc(db, "rooms", id);
-    console.log(roomColl);
-    const collRef = collection(roomColl, "messages");
-
-    console.log("dattttaaa", collRef);
-
-    let a = [];
-    await onSnapshot(query(collRef, orderBy("timestamp", "asc")), (snap) => {
-      snap.docs.map((data) => {
-        console.log("here it is", data.data().message);
-        setLastMsg(data.data().message);
-      });
+    onSnapshot(query(collection(db, "messages", id1, "chat")), (snapshot) => {
+      setLastMsg(
+        snapshot.docs.map((doc) => {
+          console.log(doc.data(), "doc");
+          const docData = doc.data();
+          return { docId: doc.id, ...docData };
+        })
+      );
     });
-
-    console.log("a", a);
   }
-
+  console.log(
+    lastMsg?.sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))[
+      lastMsg.length - 1
+    ]?.text,
+    "last"
+  );
   useEffect(() => {
     getSidebarData(id);
     setProfile(Math.floor(Math.random() * 5000));
   }, [id]);
 
-  const createChat = () => {
-    const PersonName = prompt("Hey! Enter your Name For Chat");
-
-    if (PersonName) {
-      // do after some time
-      addDoc(collection(db, "rooms"), {
-        Name: PersonName,
-      });
-      // console.log("hello", newRoomHandler, typeof newRoomHandler);
-      // newRoomHandler(profile);
-      // collection(db, "rooms").addDoc({
-      //   name: PersonName,
-      // });
-    }
-  };
-
-  return !addNewChat ? (
-    <Link to={`rooms/${id}`}>
-      <div className="sidebarChats">
+  return (
+    <Link to={`users/${id}`}>
+      <div className="sidebarChats" onClick={() => selectUser(users)}>
         <Avatar
           src={`https://avatars.dicebear.com/api/adventurer/:${profile}.svg`}
         />
         <div className="sidebarChats_Info">
           <h2>{name}</h2>
-          <p>{lastMsg}</p>
+          <p>
+            {
+              lastMsg?.sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))[
+                lastMsg.length - 1
+              ]?.text
+            }
+          </p>
         </div>
       </div>
     </Link>
-  ) : (
-    <div onClick={createChat} className="sidebarChats">
-      <h2>Add New Chat</h2>
-    </div>
   );
 }
 

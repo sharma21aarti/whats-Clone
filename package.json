@@ -9,6 +9,7 @@
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
     "@testing-library/user-event": "^13.5.0",
+    "emoji-picker-react": "^3.6.2",
     "firebase": "^9.6.5",
     "firebase-functions": "^3.17.1",
     "har-validator": "^5.1.5",

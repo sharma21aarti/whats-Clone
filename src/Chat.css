@@ -63,7 +63,6 @@
   background-image: url("/public/images/8c98994518b575bfd8c949e91d20548b.jpg");
   background-repeat: repeat;
   background-position: center;
-  padding: 30px;
   overflow-y: scroll;
 }
 
@@ -95,4 +94,12 @@
 
 .chatFooter > form > button {
   display: none;
+}
+aside.emoji-picker-react{
+  height: 230px !important;
+  width: 92% !important;
+}
+.pickerSpace{
+  position: relative;
+  margin-bottom: 230px;
 }

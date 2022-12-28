@@ -1,51 +1,55 @@
+import { doc, query, where, getDocs } from "@firebase/firestore";
 import { Avatar, IconButton } from "@material-ui/core";
-import { Chat, DonutLarge, MoreVert, Search } from "@material-ui/icons";
-import React, { useState, useEffect } from "react";
+import {
+  // Chat,
+  DonutLarge,
+  MoreVert,
+  Search,
+  Unsubscribe,
+} from "@material-ui/icons";
+
+import { collection, onSnapshot } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
+import { auth } from "./firebase";
+import db from "./firebase";
+
+import { useStateValue } from "./Reducer";
 import "./Sidebar.css";
 import SidebarChats from "./SidebarChats";
-import db from "./firebase";
-import { collection, getDocs, doc, onSnapshot } from "firebase/firestore";
-import { useStateValue } from "./Reducer";
-import {} from "@firebase/firestore";
-function Sidebar() {
-  console.log("first");
-  const [rooms, setRooms] = useState([]);
-  // const [newRoomId, setNewRoomId] = useState("");
+import Chat from "./Chat";
+
+export const UserContext = React.createContext();
+
+function Sidebar({ setRId }) {
+  const [users, setUsers] = useState([]);
   const [{ user }, dispatch] = useStateValue();
 
-  // const newRoomHandler = (roomId) => {
-  //   setNewRoomId(roomId);
-  // };
-  useEffect(() => {
-    console.log("callewd");
-
-    // const roomCol = await collection(db, "rooms");
-
-    // const roomSnapshot = await getDocs(roomCol);
-    // const roomList = roomSnapshot.docs.map((doc) => ({
-    //   id: doc.id,
-    //   data: doc.data(),
-    // }));
-    // console.log(roomList);
-    // setRooms(roomList);
-    console.log("hers", collection(db, "rooms"));
-
-    // const q = collection(db, "rooms");
-    onSnapshot(collection(db, "rooms"), (snap) =>
-      setRooms(
-        snap.docs.map((item) => {
-          return { id: item.id, data: item.data() };
-        })
-      )
+  async function fetchSidebar() {
+    const q = query(
+      collection(db, "users"),
+      where("id", "not-in", [auth.currentUser.uid])
     );
+    console.log(q, "q");
 
-    // getRooms(db);
+    //execute query
+    const unsub = onSnapshot(q, (user) => {
+      let users = [];
+      user.forEach((doc) => {
+        return users.push({ id: doc.id, data: doc.data() });
+      });
+      setUsers(users);
+    });
 
-    // const a = getDocs(collection(db, "rooms"));
-    // setRooms(a.docs);
+    return () => unsub();
+  }
+
+  useEffect(() => {
+    fetchSidebar();
   }, []);
-
-  // console.log("sss", rooms);
+  // console.log(users, "users");
+  const selectUser = (users) => {
+    setRId(users);
+  };
   return (
     <>
       <div className="sidebar">
@@ -55,9 +59,9 @@ function Sidebar() {
             <IconButton>
               <DonutLarge />
             </IconButton>
-            <IconButton>
+            {/* <IconButton>
               <Chat />
-            </IconButton>
+            </IconButton> */}
             <IconButton>
               <MoreVert />
             </IconButton>
@@ -69,13 +73,24 @@ function Sidebar() {
             <input placeholder="Search or Start the new chats" type="text" />
           </div>
         </div>
+
         <div className="sidebar_chats">
-          <SidebarChats addNewChat />
-          {rooms.map((room) => {
-            // const name = room.data();
-            // console.log("okkaaa", name);
+          {/* {rooms.map((room) => {
             return (
               <SidebarChats key={room.id} id={room.id} name={room.data.Name} />
+              // <SidebarChats key={i + 1} name={room.Name} />
+            );
+          })} */}
+
+          {users.map((user) => {
+            return (
+              <SidebarChats
+                key={user.uid}
+                id={user.data.id}
+                name={user.data.name}
+                users={user.data}
+                selectUser={selectUser}
+              />
               // <SidebarChats key={i + 1} name={room.Name} />
             );
           })}

@@ -56,3 +56,67 @@
   flex: 1;
   background-color: white;
 }
+
+.menu {
+  position: absolute;
+  top: 20%;
+  left: 20%;
+  display: none;
+  line-height: 40px;
+  float: left;
+  /* padding: 10px 30px; */
+  background-color: #fff;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  border-radius: 7px;
+}
+
+.menu ul {
+  list-style: none;
+
+  padding: 0;
+}
+
+.menu ul li button {
+  padding: 10px 50px 10px 30px;
+  border: none;
+  background: none;
+  font-size: 14px;
+  color: #616161;
+  /* background-color: #ebebeb; */
+}
+
+.menu ul li:hover {
+  background-color: #ebebeb;
+}
+
+.modalMenu {
+  background-color: #fff;
+  padding: 15px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px,
+    rgba(0, 0, 0, 0.22) 0px 10px 10px;
+  width: 500px;
+  height: 160px;
+}
+.logout-heading {
+  color: #363535;
+  margin: 10px 0px 20px 0px;
+}
+.btn-cancle {
+  border: none;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px,
+    rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+  padding: 10px 20px;
+  background-color: #fff;
+  color: #008069;
+  margin-right: 10px;
+}
+.btn-logout {
+  border: none;
+  background-color: #008069;
+  padding: 10px 20px;
+  color: #fff;
+  margin-right: 10px;
+}
+.btn {
+  margin-bottom: 20px;
+}

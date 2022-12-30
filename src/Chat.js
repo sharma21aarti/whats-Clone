@@ -16,22 +16,21 @@ import {
 } from "@material-ui/icons";
 import Picker from "emoji-picker-react";
 import React, { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./Chat.css";
 import db from "./firebase";
 
 import { useStateValue } from "./Reducer";
 
-function Chat({ rId }) {
-  console.log("rId", rId);
+function Chat() {
   const [input, setInput] = useState("");
   const [profile, setProfile] = useState("");
   const { roomId } = useParams();
   const [pickerOpen, setPickerOpen] = useState(false);
   const [roomName, setRoomName] = useState();
   const [messages, setMessages] = useState([]);
-
-  const [{ user }, dispatch] = useStateValue();
+  const rId = JSON.parse(localStorage.getItem("chat-id"));
+  const user = useStateValue();
   const messageRef = useRef(null);
   const onEmojiClick = (event, emojiObject) => {
     setInput((prv) => prv + emojiObject.emoji);
@@ -40,17 +39,18 @@ function Chat({ rId }) {
   const scrollToBottom = () => {
     messageRef?.current?.scrollIntoView({ behavior: "smooth" });
   };
-
-  console.log(rId.id, "receiver");
+  const navigate = useNavigate();
 
   const id =
-    user.uid > rId.id
-      ? `${rId.id + " " + user.uid}`
-      : `${user.uid + " " + rId.id}`;
-  console.log(id, "id");
+    user.uid > rId?.id
+      ? `${rId?.id + " " + user?.uid}`
+      : `${user?.uid + " " + rId?.id}`;
 
   useEffect(() => {
     scrollToBottom();
+    if (!user) {
+      navigate("/");
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -65,7 +65,7 @@ function Chat({ rId }) {
 
     setProfile(Math.floor(Math.random() * 5000));
 
-    setRoomName(rId.name);
+    setRoomName(rId?.name);
   }, [id]);
 
   console.log(messages);
@@ -76,116 +76,137 @@ function Chat({ rId }) {
       text: input,
       name: user.displayName,
       timestamp: serverTimestamp(),
-      sender: user.uid,
+      sender: user?.uid,
       receiver: rId,
     });
 
     setInput("");
   };
 
-  const deleteMsg = (id) => {
-    const roomColl = collection(db, "rooms");
-    const roomdoc = doc(roomColl, roomId);
-    const messageColl = collection(roomdoc, "messages");
+  // const deleteMsg = (id) => {
+  //   const roomColl = collection(db, "rooms");
+  //   const roomdoc = doc(roomColl, roomId);
+  //   const messageColl = collection(roomdoc, "messages");
 
-    const messageDoc = doc(messageColl, id);
-  };
+  //   const messageDoc = doc(messageColl, id);
+  // };
 
   return (
     <>
-      <div className="chat">
-        <div className="chatHeader">
-          <Avatar
-            src={`https://avatars.dicebear.com/api/adventurer/:${profile}.svg`}
-            // src={`${user.photoURL}`}
-          />
+      {rId?.id ? (
+        <div className="chat">
+          <div className="chatHeader">
+            <Avatar
+              src={`https://avatars.dicebear.com/api/adventurer/:${profile}.svg`}
+              // src={`${user.photoURL}`}
+            />
 
-          <div className="chatHEader_Info">
-            <h3>{roomName} </h3>
-            <p>
-              Last Seen{" "}
-              {new Date(
-                messages[messages.length - 1]?.timestamp?.seconds * 1000
-              ).toLocaleString()}
-              {/* Last Seen {nusers/svdhweqweqew Date(messages[messages.length - 1].timestamp)}{" "} */}
-            </p>
-          </div>
-          <div className="chat_headerRight">
-            <IconButton>
-              <Search />
-            </IconButton>
+            <div className="chatHEader_Info">
+              <h3>{roomName} </h3>
+              {console.log(rId.isOnline, "rId.isOnline")}
+              <p>
+                {rId.isOnline ? (
+                  "Online"
+                ) : (
+                  <>
+                    {" "}
+                    Last Seen{" "}
+                    {new Date(
+                      messages[messages.length - 1]?.timestamp?.seconds * 1000
+                    ).toLocaleString()}
+                  </>
+                )}
+              </p>
+            </div>
+            <div className="chat_headerRight">
+              <IconButton>
+                <Search />
+              </IconButton>
 
-            <IconButton>
-              <AttachFile />
-            </IconButton>
-            <IconButton>
-              <MoreVert />
-            </IconButton>
+              <IconButton>
+                <AttachFile />
+              </IconButton>
+              <IconButton>
+                <MoreVert />
+              </IconButton>
+            </div>
           </div>
-        </div>
-        <div className={`${pickerOpen ? "chatBody pickerSpace" : "chatBody"}`}>
-          <div className="" style={{ padding: "30px" }}>
-            {messages && messages?.length > 0 ? (
-              messages
-                .sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))
-                .map((msg, i) => {
-                  return (
-                    <p
-                      key={i}
-                      className={`chat_message ${
-                        msg?.name === user.displayName && "chat_reciever"
-                      }`}
-                    >
-                      <span className="chat_name"> {msg?.name} </span>
-                      {msg?.text}
-                      <span className="chat_timespan">
-                        {new Date(
-                          msg?.timestamp?.seconds * 1000
-                        ).toLocaleString()}
-                      </span>
-                      {/* {user.email === msg.email ? (
+          <div
+            className={`${pickerOpen ? "chatBody pickerSpace" : "chatBody"}`}
+          >
+            <div className="" style={{ padding: "30px" }}>
+              {messages && messages?.length > 0 ? (
+                messages
+                  .sort((a, b) => (a.timestamp > b.timestamp ? 1 : -1))
+                  .map((msg, i) => {
+                    return (
+                      <p
+                        key={i}
+                        className={`chat_message ${
+                          msg?.name === user.displayName && "chat_reciever"
+                        }`}
+                      >
+                        <span className="chat_name"> {msg?.name} </span>
+                        {msg?.text}
+                        <span className="chat_timespan">
+                          {new Date(
+                            msg?.timestamp?.seconds * 1000
+                          ).toLocaleString()}
+                        </span>
+                        {/* {user.email === msg.email ? (
                         <IconButton onClick={() => deleteMsg(msg.docId)}>
                           <Delete />
                         </IconButton>
                       ) : null} */}
-                    </p>
-                  );
-                })
-            ) : (
-              <></>
-            )}
-          </div>
+                      </p>
+                    );
+                  })
+              ) : (
+                <></>
+              )}
+            </div>
 
-          <div ref={messageRef} />
+            <div ref={messageRef} />
+          </div>
+          {pickerOpen ? (
+            <div
+              className="emoji-picker"
+              style={{ position: "absolute", top: "45%" }}
+            >
+              <Picker onEmojiClick={onEmojiClick} />
+            </div>
+          ) : (
+            ""
+          )}
+
+          <div className="chatFooter">
+            <InsertEmoticon onClick={() => setPickerOpen((prev) => !prev)} />
+
+            <form>
+              <input
+                placeholder="Type a message"
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+              />
+              <button onClick={sendMessage} type="submit">
+                Send a message
+              </button>
+            </form>
+            <Mic />
+          </div>
         </div>
-        {pickerOpen ? (
+      ) : (
+        <div className="chat">
           <div
-            className="emoji-picker"
-            style={{ position: "absolute", top: "45%" }}
+            className={`${pickerOpen ? "chatBody pickerSpace" : "chatBody"}`}
           >
-            <Picker onEmojiClick={onEmojiClick} />
+            <div className="" style={{ padding: "30px" }}></div>
+
+            <div ref={messageRef} />
           </div>
-        ) : (
-          ""
-        )}
-
-        <div className="chatFooter">
-          <InsertEmoticon onClick={() => setPickerOpen((prev) => !prev)} />
-
-          <form>
-            <input
-              placeholder="Type a message"
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-            />
-            <button onClick={sendMessage} type="submit">
-              Send a message
-            </button>
-          </form>
-          <Mic />
         </div>
-      </div>
+      )}
     </>
   );
 }

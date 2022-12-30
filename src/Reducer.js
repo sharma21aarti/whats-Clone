@@ -1,4 +1,13 @@
-import React, { createContext, useReducer, useContext } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import React, {
+  createContext,
+  useReducer,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { useNavigate } from "react-router-dom";
+import db from "./firebase";
 
 export const initialState = {
   user: null,
@@ -26,10 +35,21 @@ export default reducer;
 export const StateContext = createContext();
 
 export const StateProvider = ({ reducer, initialState, children }) => {
-  const state = useReducer(reducer, initialState);
-  return (
-    <StateContext.Provider value={state}>{children}</StateContext.Provider>
-  );
+  const navigate = useNavigate();
+  // const state = useReducer(reducer, initialState);
+  const [user, setUser] = useState();
+
+  useEffect(() => {
+    const userInfo = JSON.parse(window.localStorage.getItem("user"));
+    console.log(userInfo, "token");
+    if (!userInfo) {
+      navigate("/login");
+    } else {
+      setUser(userInfo);
+    }
+  }, [navigate]);
+  console.log("first", user);
+  return <StateContext.Provider value={user}>{children}</StateContext.Provider>;
 };
 
 export const useStateValue = () => useContext(StateContext);

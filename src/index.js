@@ -2,15 +2,18 @@ import React from "react";
 import App from "./App";
 import ReactDOM from "react-dom";
 import "./index.css";
+import { BrowserRouter } from "react-router-dom";
 import reportWebVitals from "./reportWebVitals";
 import { StateProvider } from "./Reducer";
 import reducer, { initialState } from "./Reducer";
 
 ReactDOM.render(
   <React.StrictMode>
-    <StateProvider initialState={initialState} reducer={reducer}>
-      <App />
-    </StateProvider>
+    <BrowserRouter>
+      <StateProvider>
+        <App />
+      </StateProvider>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")
 );

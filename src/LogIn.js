@@ -5,22 +5,34 @@ import { signInWithPopup } from "@firebase/auth";
 import { provider, auth } from "./firebase";
 import { actionTypes, useStateValue } from "./Reducer";
 import db from "./firebase";
-import { doc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  query,
+  setDoc,
+} from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 function LogIn() {
-  const [{ user }, dispatch] = useStateValue();
-
+  // const { user  = useStateValue();
+  const navigate = useNavigate();
+  console.log("dsfd ");
   const signIn = () => {
     async function addCollection(result) {
-      dispatch({
-        type: actionTypes.SET_USER,
-        user: result.user,
-      });
+      window.localStorage.setItem("user", JSON.stringify(result.user));
 
       const newUser = await doc(db, "users", result.user.uid);
       await setDoc(newUser, {
         id: result.user.uid,
         name: result.user.displayName,
+        isOnline: true,
+        token: result.user.stsTokenManager.accessToken,
       });
+      const userDoc = await doc(db, "users", result.user.uid);
+      const userSnap = await getDoc(userDoc);
+      localStorage.setItem("token", userSnap.data()?.token);
+      navigate("/chat-area");
     }
 
     signInWithPopup(auth, provider)

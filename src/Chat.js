@@ -30,7 +30,7 @@ function Chat() {
   const [roomName, setRoomName] = useState();
   const [messages, setMessages] = useState([]);
   const rId = JSON.parse(localStorage.getItem("chat-id"));
-  const user = useStateValue();
+  const { user } = useStateValue();
   const messageRef = useRef(null);
   const onEmojiClick = (event, emojiObject) => {
     setInput((prv) => prv + emojiObject.emoji);
@@ -68,8 +68,6 @@ function Chat() {
     setRoomName(rId?.name);
   }, [id]);
 
-  console.log(messages);
-
   const sendMessage = async (e) => {
     e.preventDefault();
     await addDoc(collection(db, "messages", id, "chat"), {
@@ -103,7 +101,6 @@ function Chat() {
 
             <div className="chatHEader_Info">
               <h3>{roomName} </h3>
-              {console.log(rId.isOnline, "rId.isOnline")}
               <p>
                 {rId.isOnline ? (
                   "Online"

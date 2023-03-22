@@ -18,39 +18,39 @@ import db from "./firebase";
 // import { Room } from "@material-ui/icons";
 
 function App() {
-  console.log("in app");
   const navigate = useNavigate();
-  const user = useStateValue();
+  const { user } = useStateValue();
   const token = localStorage.getItem("token");
+  console.log(token?.stsTokenManager?.accessToken, "token");
+  console.log(token?.stsTokenManager?.refreshToken, "token");
 
-  async function checkUser() {
-    const userDoc = await doc(db, "users", user?.uid);
-    const userSnap = await getDoc(userDoc);
-    console.log("here");
-    if (userSnap?.data()?.token !== token) {
-      window.localStorage.removeItem("user");
-      window.localStorage.removeItem("token");
-      const updateUser = await doc(db, "users", user.uid);
-      const data = {
-        isOnline: false,
-      };
-      updateDoc(updateUser, data)
-        .then((docRef) => {
-          console.log("Value of an Existing Document Field has been updated");
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      navigate("/login");
-    }
-  }
-  useEffect(() => {
-    checkUser();
-  }, [navigate, token]);
+  // async function checkUser() {
+  //   const userDoc = await doc(db, "users", user?.uid);
+  //   const userSnap = await getDoc(userDoc);
+  //
+  //   if (userSnap?.data()?.token !== token) {
+  //     window.localStorage.removeItem("user");
+  //     window.localStorage.removeItem("token");
+  //     const updateUser = await doc(db, "users", user.uid);
+  //     const data = {
+  //       isOnline: false,
+  //     };
+  //     updateDoc(updateUser, data)
+  //       .then((docRef) => {
+  //         console.log("Value of an Existing Document Field has been updated");
+  //       })
+  //       .catch((error) => {
+  //         console.log(error);
+  //       });
+  //     navigate("/login");
+  //   }
+  // }
+  // useEffect(() => {
+  //   checkUser();
+  // }, [navigate, token]);
 
   return (
     <div className="App">
-      {console.log("user", user)}
       {!user ? (
         <Routes>
           <Route path="/login" element={<LogIn />}></Route>

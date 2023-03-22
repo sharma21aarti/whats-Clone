@@ -26,7 +26,7 @@ function Sidebar() {
   const [users, setUsers] = useState([]);
   const [openMenu, setOpenMenu] = useState(false);
   const [showMenu, setMenu] = useState(false);
-  const user = useStateValue();
+  const { user, setUser } = useStateValue();
   const token = localStorage.getItem("token");
 
   function show() {
@@ -43,7 +43,6 @@ function Sidebar() {
       collection(db, "users"),
       where("id", "not-in", [user?.uid])
     );
-    console.log(user?.uid, "q");
 
     //execute query
     const unsub = onSnapshot(q, (user) => {
@@ -56,10 +55,13 @@ function Sidebar() {
 
     return () => unsub();
   }
-  console.log(showMenu);
   async function checkUser() {
-    window.localStorage.removeItem("user");
-    window.localStorage.removeItem("token");
+    setUser("");
+    window.localStorage.clear();
+    navigate("/login");
+
+    // window.localStorage.removeItem("token");
+    // localStorage.removeItem("chat-id");
     const updateUser = await doc(db, "users", user.uid);
     const data = {
       isOnline: false,
@@ -71,8 +73,6 @@ function Sidebar() {
       .catch((error) => {
         console.log(error);
       });
-
-    navigate("/login");
   }
 
   useEffect(() => {
@@ -86,7 +86,7 @@ function Sidebar() {
     <>
       <div className="sidebar">
         <div className="sidebar_header">
-          <Avatar src={user.photoURL} />
+          <Avatar src={user?.photoURL} />
           <div className="sidebar_headerRight">
             <Link to="/status">
               <IconButton>
@@ -141,10 +141,10 @@ function Sidebar() {
             );
           })} */}
 
-          {users.map((user) => {
+          {users?.map((user) => {
             return (
               <SidebarChats
-                key={user}
+                key={user.data.id}
                 id={user.data.id}
                 name={user.data.name}
                 users={user.data}
@@ -155,7 +155,7 @@ function Sidebar() {
           })}
         </div>
         {openMenu && (
-          <Modal openModal={openMenu} setModel={setOpenMenu}>
+          <Modal openMenu={openMenu} setOpenMenu={setOpenMenu}>
             <div className="modalMenu">
               <div className="logout-heading">
                 <h3>Log Out</h3>
@@ -173,7 +173,7 @@ function Sidebar() {
                 >
                   CANCLE
                 </button>
-                <button className="btn-logout" onClick={() => checkUser()}>
+                <button className="btn-logout" onClick={checkUser}>
                   LOGOUT
                 </button>
               </div>

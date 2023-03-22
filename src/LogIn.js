@@ -17,7 +17,6 @@ import { useNavigate } from "react-router-dom";
 function LogIn() {
   // const { user  = useStateValue();
   const navigate = useNavigate();
-  console.log("dsfd ");
   const signIn = () => {
     async function addCollection(result) {
       window.localStorage.setItem("user", JSON.stringify(result.user));

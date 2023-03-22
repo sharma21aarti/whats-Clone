@@ -41,15 +41,17 @@ export const StateProvider = ({ reducer, initialState, children }) => {
 
   useEffect(() => {
     const userInfo = JSON.parse(window.localStorage.getItem("user"));
-    console.log(userInfo, "token");
     if (!userInfo) {
       navigate("/login");
     } else {
       setUser(userInfo);
     }
   }, [navigate]);
-  console.log("first", user);
-  return <StateContext.Provider value={user}>{children}</StateContext.Provider>;
+  return (
+    <StateContext.Provider value={{ user, setUser }}>
+      {children}
+    </StateContext.Provider>
+  );
 };
 
 export const useStateValue = () => useContext(StateContext);

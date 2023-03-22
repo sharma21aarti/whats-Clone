@@ -24,23 +24,22 @@ const ModalWrapper = {
   borderRadius: "10px",
 };
 
-function Modal({ openModal, setModel, children }) {
-  console.log("first");
+function Modal({ openMenu, setOpenMenu, children }) {
   const modalRef = useRef();
 
   const closeModal = (e) => {
     if (modalRef.current === e.target) {
-      setModel(false);
+      setOpenMenu(false);
     }
   };
 
   const keyPress = useCallback(
     (e) => {
-      if (e.key === "Escape" && openModal) {
-        setModel(false);
+      if (e.key === "Escape" && openMenu) {
+        setOpenMenu(false);
       }
     },
-    [setModel, openModal]
+    [setOpenMenu, openMenu]
   );
 
   useEffect(() => {
@@ -50,14 +49,14 @@ function Modal({ openModal, setModel, children }) {
 
   return createPortal(
     <>
-      {openModal ? (
+      {openMenu ? (
         <div
           onClick={closeModal}
           ref={modalRef}
           className="hideScroll"
           style={Background}
         >
-          <div openModal={openModal} style={ModalWrapper}>
+          <div openMenu={openMenu} style={ModalWrapper}>
             {children}
           </div>
         </div>

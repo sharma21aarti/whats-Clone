@@ -13,7 +13,7 @@ import "./SidebarChats.css";
 function SidebarChats({ id, name, users, selectUser }) {
   const [profile, setProfile] = useState("");
   const [lastMsg, setLastMsg] = useState();
-  const user = useStateValue();
+  const { user } = useStateValue();
   const id1 =
     user?.uid > id ? `${id + " " + user?.uid}` : `${user?.uid + " " + id}`;
 
